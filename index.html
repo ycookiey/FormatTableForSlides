@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FormatTableForSlides - スライド向け表フォーマッター</title>
+    <meta name="description" content="ExcelやCSVのデータをプレゼンスライド向けの表として整形するWebツール" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <script type="module" crossorigin src="/FormatTableForSlides/assets/index-sZjYDZ-g.js"></script>
+    <link rel="stylesheet" crossorigin href="/FormatTableForSlides/assets/index-BxDZrCGQ.css">
+  </head>
+  <body>
+    <div id="app">
+      <header class="header">
+        <h1>FormatTableForSlides</h1>
+        <p class="subtitle">リストデータをスライド向けの段組み表に変換</p>
+      </header>
+
+      <main class="main-container">
+        <!-- 左パネル: 設定・入力 -->
+        <section class="panel panel-left">
+          <div class="input-section">
+            <div class="input-header">
+              <label for="data-input" class="section-label">データ入力</label>
+              <button id="sample-button" class="sample-button">サンプルを入力</button>
+            </div>
+            <textarea 
+              id="data-input" 
+              class="data-input"
+              placeholder="ExcelやCSVからデータを貼り付けてください..."
+              rows="10"
+            ></textarea>
+          </div>
+
+          <div class="options-section">
+            <div class="option-group">
+              <label class="section-label">レイアウト設定</label>
+              
+              <div class="option-row">
+                <label for="split-columns">分割数</label>
+                <div class="split-controls">
+                  <input type="range" id="split-columns" min="1" max="5" value="1" />
+                  <span id="split-value" class="split-value">1</span>
+                </div>
+              </div>
+
+              <div class="option-row">
+                <label for="header-option">
+                  <input type="checkbox" id="header-option" checked />
+                  1行目をヘッダーとして扱う
+                </label>
+              </div>
+
+              <div class="option-row">
+                <label for="separator-type">ブロック区切り</label>
+                <select id="separator-type">
+                  <option value="column">空白列</option>
+                  <option value="border">罫線のみ</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="option-group">
+              <label class="section-label">データ加工</label>
+              
+              <div class="option-row">
+                <label for="add-numbers">
+                  <input type="checkbox" id="add-numbers" />
+                  自動連番を付与
+                </label>
+              </div>
+
+              <div class="option-row">
+                <label for="format-numbers">
+                  <input type="checkbox" id="format-numbers" checked />
+                  数値を3桁区切りに
+                </label>
+              </div>
+            </div>
+
+            <div class="option-group">
+              <label class="section-label">デザイン</label>
+              
+              <div class="option-row">
+                <label for="theme">テーマ</label>
+                <select id="theme">
+                  <option value="standard-blue">Standard Blue</option>
+                  <option value="dark-gray">Dark Gray</option>
+                  <option value="minimal">Minimal</option>
+                  <option value="accent-green">Accent Green</option>
+                </select>
+              </div>
+
+              <div class="option-row">
+                <label for="zebra">
+                  <input type="checkbox" id="zebra" checked />
+                  縞模様（ゼブラストライプ）
+                </label>
+              </div>
+
+              <div class="option-row">
+                <label for="density">密度</label>
+                <select id="density">
+                  <option value="comfortable">広め</option>
+                  <option value="standard" selected>標準</option>
+                  <option value="compact">狭め</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 右パネル: プレビュー -->
+        <section class="panel panel-right">
+          <div class="preview-header">
+            <label class="section-label">プレビュー</label>
+            <button id="copy-button" class="copy-button">
+              <span class="copy-icon">📋</span>
+              コピー
+            </button>
+          </div>
+          <div id="preview" class="preview-area">
+            <p class="placeholder-text">データを入力するとプレビューが表示されます</p>
+          </div>
+        </section>
+      </main>
+
+      <div id="toast" class="toast hidden">コピーしました！</div>
+    </div>
+  </body>
+</html>
