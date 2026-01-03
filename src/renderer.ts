@@ -57,6 +57,7 @@ export function renderTable(data: TableData, style: StyleOptions): string {
     border-collapse: collapse;
     font-family: 'Segoe UI', 'Yu Gothic UI', 'Meiryo', sans-serif;
     font-size: 14px;
+    width: max-content;
   `.replace(/\s+/g, ' ').trim();
 
   let html = `<table style="${tableStyle}">`;
@@ -127,6 +128,7 @@ function buildCellStyle(options: CellStyleOptions): string {
     'border: 1px solid #D0D0D0',
     `padding: ${options.padding}`,
     `text-align: ${options.textAlign}`,
+    'white-space: nowrap',
   ];
 
   if (options.backgroundColor) {
