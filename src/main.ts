@@ -9,6 +9,7 @@ import { transformLayout } from './transformer';
 import { addRowNumbers, formatNumbers } from './formatter';
 import { renderTable, renderPlainText } from './renderer';
 import { copyToClipboard, showToast } from './clipboard';
+import { saveData, loadData } from './storage';
 
 // DOM要素
 const elements = {
@@ -101,6 +102,9 @@ function updatePreview(): void {
   // プレビュー表示
   elements.preview.innerHTML = currentHtml || '<p class="placeholder-text">データを入力するとプレビューが表示されます</p>';
   elements.preview.className = `preview-area density-${options.style.density}`;
+
+  // 設定を自動保存
+  saveData(inputText, options);
 }
 
 /**
@@ -165,6 +169,29 @@ function setupEventListeners(): void {
   });
 }
 
+/**
+ * 保存されたデータをUIに復元
+ */
+function loadStoredData(): void {
+  const stored = loadData();
+  if (!stored) return;
+
+  // 入力を復元
+  elements.dataInput.value = stored.input;
+
+  // オプションを復元
+  elements.splitColumns.value = String(stored.options.layout.splitColumns);
+  elements.splitValue.textContent = String(stored.options.layout.splitColumns);
+  elements.separatorType.value = stored.options.layout.separatorType;
+  elements.headerOption.checked = stored.options.hasHeader;
+  elements.addNumbers.checked = stored.options.format.addNumbers;
+  elements.formatNumbers.checked = stored.options.format.formatNumbers;
+  elements.theme.value = stored.options.style.theme;
+  elements.zebra.checked = stored.options.style.zebra;
+  elements.density.value = stored.options.style.density;
+}
+
 // 初期化
+loadStoredData();
 setupEventListeners();
 updatePreview();
