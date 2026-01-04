@@ -41,6 +41,53 @@ const DENSITY_PADDING: Record<Density, string> = {
 };
 
 /**
+ * 文字列の推定幅を計算（全角=2, 半角=1として概算）
+ */
+function estimateTextWidth(text: string): number {
+  let width = 0;
+  for (const char of text) {
+    // 全角文字の判定（日本語、全角記号など）
+    if (char.match(/[^\x00-\x7F]|[ａ-ｚＡ-Ｚ０-９]/)) {
+      width += 2;
+    } else {
+      width += 1;
+    }
+  }
+  return width;
+}
+
+/**
+ * 列ごとの最大幅を計算（ヘッダーを含む）
+ */
+function calculateColumnWidths(data: TableData, separatorSet: Set<number>): number[] {
+  const columnCount = data.headers.length;
+  const widths: number[] = [];
+
+  for (let col = 0; col < columnCount; col++) {
+    if (separatorSet.has(col)) {
+      // 区切り列は固定幅
+      widths.push(0);
+      continue;
+    }
+
+    // ヘッダーの幅
+    let maxWidth = data.hasHeader ? estimateTextWidth(data.headers[col] || '') : 0;
+
+    // データ行の幅
+    for (const row of data.rows) {
+      const cellWidth = estimateTextWidth(row[col] || '');
+      if (cellWidth > maxWidth) {
+        maxWidth = cellWidth;
+      }
+    }
+
+    widths.push(maxWidth);
+  }
+
+  return widths;
+}
+
+/**
  * HTMLテーブルを生成（インラインスタイル付き）
  */
 export function renderTable(data: TableData, style: StyleOptions): string {
@@ -52,6 +99,9 @@ export function renderTable(data: TableData, style: StyleOptions): string {
   const padding = DENSITY_PADDING[style.density];
   const alignments = detectAlignment(data);
   const separatorSet = new Set(data.separatorColumns || []);
+  
+  // 列幅を計算（ヘッダーを含む）
+  const columnWidths = calculateColumnWidths(data, separatorSet);
 
   const tableStyle = `
     border-collapse: collapse;
@@ -61,6 +111,19 @@ export function renderTable(data: TableData, style: StyleOptions): string {
   `.replace(/\s+/g, ' ').trim();
 
   let html = `<table style="${tableStyle}">`;
+  
+  // colgroup で列幅を明示的に設定
+  html += '<colgroup>';
+  columnWidths.forEach((width, colIndex) => {
+    if (separatorSet.has(colIndex)) {
+      html += '<col style="width: 16px; min-width: 16px;">';
+    } else {
+      // 文字幅 × 約8px（フォントサイズ14pxの半角幅）+ パディング
+      const pxWidth = Math.max(width * 8 + 24, 40); // 最小幅40px
+      html += `<col style="width: ${pxWidth}px; min-width: ${pxWidth}px;">`;
+    }
+  });
+  html += '</colgroup>';
 
   // ヘッダー行
   if (data.hasHeader && data.headers.some(h => h !== '')) {

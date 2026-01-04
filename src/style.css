@@ -351,7 +351,6 @@ body {
 
 .preview-area table {
   border-collapse: collapse;
-  width: 100%;
   font-size: 0.875rem;
 }
 
@@ -359,6 +358,7 @@ body {
 .preview-area td {
   border: 1px solid #d0d0d0;
   text-align: left;
+  white-space: nowrap;
 }
 
 /* Density: Standard */
