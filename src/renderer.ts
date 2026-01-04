@@ -112,18 +112,15 @@ export function renderTable(data: TableData, style: StyleOptions): string {
 
   let html = `<table style="${tableStyle}">`;
   
-  // colgroup で列幅を明示的に設定
-  html += '<colgroup>';
-  columnWidths.forEach((width, colIndex) => {
+  // 列幅をピクセル値に変換（各セルに適用）
+  const columnPxWidths = columnWidths.map((width, colIndex) => {
     if (separatorSet.has(colIndex)) {
-      html += '<col style="width: 16px; min-width: 16px;">';
+      return 16; // 区切り列は固定幅
     } else {
       // 文字幅 × 約8px（フォントサイズ14pxの半角幅）+ パディング
-      const pxWidth = Math.max(width * 8 + 24, 40); // 最小幅40px
-      html += `<col style="width: ${pxWidth}px; min-width: ${pxWidth}px;">`;
+      return Math.max(width * 8 + 24, 40); // 最小幅40px
     }
   });
-  html += '</colgroup>';
 
   // ヘッダー行
   if (data.hasHeader && data.headers.some(h => h !== '')) {
@@ -140,6 +137,7 @@ export function renderTable(data: TableData, style: StyleOptions): string {
           fontWeight: 'bold',
           padding,
           textAlign: alignments[colIndex] || 'left',
+          minWidth: columnPxWidths[colIndex],
         });
         html += `<th style="${headerStyle}">${escapeHtml(header)}</th>`;
       }
@@ -166,6 +164,7 @@ export function renderTable(data: TableData, style: StyleOptions): string {
           backgroundColor: rowBg,
           padding,
           textAlign: alignments[colIndex] || 'left',
+          minWidth: columnPxWidths[colIndex],
         });
         html += `<td style="${cellStyle}">${escapeHtml(cell)}</td>`;
       }
@@ -184,6 +183,7 @@ interface CellStyleOptions {
   fontWeight?: string;
   padding: string;
   textAlign: Alignment;
+  minWidth?: number;
 }
 
 function buildCellStyle(options: CellStyleOptions): string {
@@ -194,6 +194,9 @@ function buildCellStyle(options: CellStyleOptions): string {
     'white-space: nowrap',
   ];
 
+  if (options.minWidth) {
+    styles.push(`min-width: ${options.minWidth}px`);
+  }
   if (options.backgroundColor) {
     styles.push(`background-color: ${options.backgroundColor}`);
   }
