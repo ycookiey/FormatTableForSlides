@@ -9,6 +9,8 @@ export interface TableData {
   hasHeader: boolean;
   /** 区切り列のインデックス（透明化対象） */
   separatorColumns?: number[];
+  /** ブロック境界の列インデックス（右側に太い罫線を引く） */
+  borderBoundaries?: number[];
 }
 
 /** レイアウト設定 */
@@ -16,7 +18,7 @@ export interface LayoutOptions {
   /** 分割数（1-5） */
   splitColumns: number;
   /** ブロック区切りタイプ */
-  separatorType: 'column' | 'border';
+  separatorType: SeparatorType;
 }
 
 /** デザイン設定 */
@@ -49,7 +51,10 @@ export interface AllOptions {
 export type ThemeName = 'standard-blue' | 'dark-gray' | 'minimal' | 'accent-green';
 
 /** 密度 */
-export type Density = 'comfortable' | 'standard' | 'compact';
+export type Density = 'extra-comfortable' | 'comfortable' | 'standard' | 'compact' | 'extra-compact';
+
+/** ブロック区切りタイプ */
+export type SeparatorType = 'none' | 'column' | 'border';
 
 /** テーマカラー定義 */
 export interface ThemeColors {

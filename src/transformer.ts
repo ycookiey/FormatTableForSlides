@@ -64,20 +64,27 @@ export function mergeBlocks(
     return blocks[0];
   }
 
-  const addSeparator = options.separatorType === 'column';
+  const addSeparatorColumn = options.separatorType === 'column';
+  const addBorderSeparator = options.separatorType === 'border';
   const mergedHeaders: string[] = [];
   const rowCount = Math.max(...blocks.map(b => b.rows.length));
   const mergedRows: string[][] = Array(rowCount).fill(null).map(() => []);
   const separatorColumns: number[] = [];
+  const borderBoundaries: number[] = []; // 罫線を引く列（右側に罫線）
 
   blocks.forEach((block, blockIndex) => {
     // ブロック間に区切り列を追加
-    if (blockIndex > 0 && addSeparator) {
-      separatorColumns.push(mergedHeaders.length); // 現在の列数 = 次に追加される列のインデックス
+    if (blockIndex > 0 && addSeparatorColumn) {
+      separatorColumns.push(mergedHeaders.length);
       mergedHeaders.push('');
       for (let i = 0; i < rowCount; i++) {
         mergedRows[i].push('');
       }
+    }
+
+    // ブロック境界（罫線モード）: 前のブロックの最後の列に太い右罫線
+    if (blockIndex > 0 && addBorderSeparator) {
+      borderBoundaries.push(mergedHeaders.length - 1);
     }
 
     // ヘッダーを追加
@@ -95,6 +102,7 @@ export function mergeBlocks(
     rows: mergedRows,
     hasHeader: blocks[0].hasHeader,
     separatorColumns: separatorColumns.length > 0 ? separatorColumns : undefined,
+    borderBoundaries: borderBoundaries.length > 0 ? borderBoundaries : undefined,
   };
 }
 

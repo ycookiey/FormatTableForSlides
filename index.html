@@ -36,9 +36,15 @@
               
               <div class="option-row">
                 <label for="split-columns">分割数</label>
-                <div class="split-controls">
-                  <input type="range" id="split-columns" min="1" max="5" value="1" />
-                  <span id="split-value" class="split-value">1</span>
+                <div class="slider-with-ticks">
+                  <input type="range" id="split-columns" min="1" max="5" value="1" list="split-ticks" />
+                  <datalist id="split-ticks">
+                    <option value="1" label="1"></option>
+                    <option value="2" label="2"></option>
+                    <option value="3" label="3"></option>
+                    <option value="4" label="4"></option>
+                    <option value="5" label="5"></option>
+                  </datalist>
                 </div>
               </div>
 
@@ -50,11 +56,12 @@
               </div>
 
               <div class="option-row">
-                <label for="separator-type">ブロック区切り</label>
-                <select id="separator-type">
-                  <option value="column">空白列</option>
-                  <option value="border">罫線のみ</option>
-                </select>
+                <label>ブロック区切り</label>
+                <div class="segment-control" id="separator-type">
+                  <button type="button" data-value="none">なし</button>
+                  <button type="button" data-value="column" class="active">空白列</button>
+                  <button type="button" data-value="border">罫線</button>
+                </div>
               </div>
             </div>
 
@@ -80,13 +87,13 @@
               <label class="section-label">デザイン</label>
               
               <div class="option-row">
-                <label for="theme">テーマ</label>
-                <select id="theme">
-                  <option value="standard-blue">Standard Blue</option>
-                  <option value="dark-gray">Dark Gray</option>
-                  <option value="minimal">Minimal</option>
-                  <option value="accent-green">Accent Green</option>
-                </select>
+                <label>テーマ</label>
+                <div class="segment-control" id="theme">
+                  <button type="button" data-value="standard-blue" class="active">Blue</button>
+                  <button type="button" data-value="dark-gray">Gray</button>
+                  <button type="button" data-value="minimal">Minimal</button>
+                  <button type="button" data-value="accent-green">Green</button>
+                </div>
               </div>
 
               <div class="option-row">
@@ -98,11 +105,16 @@
 
               <div class="option-row">
                 <label for="density">密度</label>
-                <select id="density">
-                  <option value="comfortable">広め</option>
-                  <option value="standard" selected>標準</option>
-                  <option value="compact">狭め</option>
-                </select>
+                <div class="slider-with-ticks">
+                  <input type="range" id="density" min="1" max="5" value="3" list="density-ticks" />
+                  <datalist id="density-ticks">
+                    <option value="1" label="狭"></option>
+                    <option value="2"></option>
+                    <option value="3" label="標準"></option>
+                    <option value="4"></option>
+                    <option value="5" label="広"></option>
+                  </datalist>
+                </div>
               </div>
             </div>
           </div>

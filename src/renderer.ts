@@ -35,9 +35,11 @@ const THEMES: Record<ThemeName, ThemeColors> = {
 
 /** 密度ごとのパディング */
 const DENSITY_PADDING: Record<Density, string> = {
+  'extra-comfortable': '16px 20px',
   comfortable: '12px 16px',
   standard: '8px 12px',
   compact: '4px 8px',
+  'extra-compact': '2px 4px',
 };
 
 /**
@@ -99,6 +101,7 @@ export function renderTable(data: TableData, style: StyleOptions): string {
   const padding = DENSITY_PADDING[style.density];
   const alignments = detectAlignment(data);
   const separatorSet = new Set(data.separatorColumns || []);
+  const borderBoundarySet = new Set(data.borderBoundaries || []);
   
   // 列幅を計算（ヘッダーを含む）
   const columnWidths = calculateColumnWidths(data, separatorSet);
@@ -138,6 +141,7 @@ export function renderTable(data: TableData, style: StyleOptions): string {
           padding,
           textAlign: alignments[colIndex] || 'left',
           minWidth: columnPxWidths[colIndex],
+          borderRight: borderBoundarySet.has(colIndex) ? '3px solid #666' : undefined,
         });
         html += `<th style="${headerStyle}">${escapeHtml(header)}</th>`;
       }
@@ -165,6 +169,7 @@ export function renderTable(data: TableData, style: StyleOptions): string {
           padding,
           textAlign: alignments[colIndex] || 'left',
           minWidth: columnPxWidths[colIndex],
+          borderRight: borderBoundarySet.has(colIndex) ? '3px solid #666' : undefined,
         });
         html += `<td style="${cellStyle}">${escapeHtml(cell)}</td>`;
       }
@@ -184,6 +189,7 @@ interface CellStyleOptions {
   padding: string;
   textAlign: Alignment;
   minWidth?: number;
+  borderRight?: string;
 }
 
 function buildCellStyle(options: CellStyleOptions): string {
@@ -205,6 +211,9 @@ function buildCellStyle(options: CellStyleOptions): string {
   }
   if (options.fontWeight) {
     styles.push(`font-weight: ${options.fontWeight}`);
+  }
+  if (options.borderRight) {
+    styles.push(`border-right: ${options.borderRight}`);
   }
 
   return styles.join('; ');

@@ -3,7 +3,7 @@
  */
 
 import './style.css';
-import type { AllOptions, TableData, ThemeName, Density } from './types';
+import type { AllOptions, TableData, ThemeName, Density, SeparatorType } from './types';
 import { parseInput, normalizeColumns } from './parser';
 import { transformLayout } from './transformer';
 import { addRowNumbers, formatNumbers } from './formatter';
@@ -15,17 +15,47 @@ import { saveData, loadData } from './storage';
 const elements = {
   dataInput: document.getElementById('data-input') as HTMLTextAreaElement,
   splitColumns: document.getElementById('split-columns') as HTMLInputElement,
-  splitValue: document.getElementById('split-value') as HTMLSpanElement,
   headerOption: document.getElementById('header-option') as HTMLInputElement,
-  separatorType: document.getElementById('separator-type') as HTMLSelectElement,
+  separatorType: document.getElementById('separator-type') as HTMLDivElement,
   addNumbers: document.getElementById('add-numbers') as HTMLInputElement,
   formatNumbers: document.getElementById('format-numbers') as HTMLInputElement,
-  theme: document.getElementById('theme') as HTMLSelectElement,
+  theme: document.getElementById('theme') as HTMLDivElement,
   zebra: document.getElementById('zebra') as HTMLInputElement,
-  density: document.getElementById('density') as HTMLSelectElement,
+  density: document.getElementById('density') as HTMLInputElement,
   preview: document.getElementById('preview') as HTMLDivElement,
   copyButton: document.getElementById('copy-button') as HTMLButtonElement,
   sampleButton: document.getElementById('sample-button') as HTMLButtonElement,
+};
+
+/** セグメントコントロールから値を取得 */
+function getSegmentValue(container: HTMLElement): string {
+  const active = container.querySelector('button.active');
+  return active?.getAttribute('data-value') || '';
+}
+
+/** セグメントコントロールに値を設定 */
+function setSegmentValue(container: HTMLElement, value: string): void {
+  container.querySelectorAll('button').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-value') === value);
+  });
+}
+
+/** 密度スライダー値(1-5)からDensity型へ変換 (左=狭、右=広) */
+const DENSITY_MAP: Record<number, Density> = {
+  1: 'extra-compact',
+  2: 'compact',
+  3: 'standard',
+  4: 'comfortable',
+  5: 'extra-comfortable',
+};
+
+/** Density型からスライダー値(1-5)へ変換 */
+const DENSITY_REVERSE: Record<Density, number> = {
+  'extra-compact': 1,
+  'compact': 2,
+  'standard': 3,
+  'comfortable': 4,
+  'extra-comfortable': 5,
 };
 
 // サンプルデータ
@@ -47,15 +77,16 @@ let currentPlainText = '';
  * 現在のオプション設定を取得
  */
 function getOptions(): AllOptions {
+  const densityValue = parseInt(elements.density.value, 10);
   return {
     layout: {
       splitColumns: parseInt(elements.splitColumns.value, 10),
-      separatorType: elements.separatorType.value as 'column' | 'border',
+      separatorType: getSegmentValue(elements.separatorType) as SeparatorType,
     },
     style: {
-      theme: elements.theme.value as ThemeName,
+      theme: getSegmentValue(elements.theme) as ThemeName,
       zebra: elements.zebra.checked,
-      density: elements.density.value as Density,
+      density: DENSITY_MAP[densityValue] || 'standard',
     },
     format: {
       addNumbers: elements.addNumbers.checked,
@@ -132,19 +163,34 @@ function setupEventListeners(): void {
   elements.dataInput.addEventListener('input', debouncedUpdate);
 
   // 分割数スライダー
-  elements.splitColumns.addEventListener('input', () => {
-    elements.splitValue.textContent = elements.splitColumns.value;
-    updatePreview();
-  });
+  elements.splitColumns.addEventListener('input', updatePreview);
+
+  // 密度スライダー
+  elements.density.addEventListener('input', updatePreview);
 
   // その他のオプション（即時更新）
   elements.headerOption.addEventListener('change', updatePreview);
-  elements.separatorType.addEventListener('change', updatePreview);
   elements.addNumbers.addEventListener('change', updatePreview);
   elements.formatNumbers.addEventListener('change', updatePreview);
-  elements.theme.addEventListener('change', updatePreview);
   elements.zebra.addEventListener('change', updatePreview);
-  elements.density.addEventListener('change', updatePreview);
+
+  // セグメントコントロール(テーマ)
+  elements.theme.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'BUTTON') {
+      setSegmentValue(elements.theme, target.getAttribute('data-value') || '');
+      updatePreview();
+    }
+  });
+
+  // セグメントコントロール(ブロック区切り)
+  elements.separatorType.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'BUTTON') {
+      setSegmentValue(elements.separatorType, target.getAttribute('data-value') || '');
+      updatePreview();
+    }
+  });
 
   // サンプル入力ボタン
   elements.sampleButton.addEventListener('click', () => {
@@ -181,14 +227,13 @@ function loadStoredData(): void {
 
   // オプションを復元
   elements.splitColumns.value = String(stored.options.layout.splitColumns);
-  elements.splitValue.textContent = String(stored.options.layout.splitColumns);
-  elements.separatorType.value = stored.options.layout.separatorType;
+  setSegmentValue(elements.separatorType, stored.options.layout.separatorType);
   elements.headerOption.checked = stored.options.hasHeader;
   elements.addNumbers.checked = stored.options.format.addNumbers;
   elements.formatNumbers.checked = stored.options.format.formatNumbers;
-  elements.theme.value = stored.options.style.theme;
+  setSegmentValue(elements.theme, stored.options.style.theme);
   elements.zebra.checked = stored.options.style.zebra;
-  elements.density.value = stored.options.style.density;
+  elements.density.value = String(DENSITY_REVERSE[stored.options.style.density] || 3);
 }
 
 // 初期化
