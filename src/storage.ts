@@ -2,7 +2,7 @@
  * ストレージモジュール - localStorage への保存・復元
  */
 
-import type { AllOptions, ThemeName, Density } from './types';
+import type { AllOptions, ThemeName, Density, HighlightPreset } from './types';
 
 /** ローカルストレージのキー */
 const STORAGE_KEY = 'formatTableForSlides';
@@ -23,6 +23,9 @@ const DEFAULT_OPTIONS: AllOptions = {
     theme: 'standard-blue',
     zebra: true,
     density: 'standard',
+    highlightWords: [],
+    highlightPreset: 'yellow',
+    highlightCustomColor: '#FFFF99',
   },
   format: {
     addNumbers: false,
@@ -89,6 +92,15 @@ function mergeWithDefaults(options?: Partial<AllOptions>): AllOptions {
       density: isValidDensity(options.style?.density)
         ? options.style!.density
         : DEFAULT_OPTIONS.style.density,
+      highlightWords: Array.isArray(options.style?.highlightWords)
+        ? options.style!.highlightWords
+        : DEFAULT_OPTIONS.style.highlightWords,
+      highlightPreset: isValidHighlightPreset(options.style?.highlightPreset)
+        ? options.style!.highlightPreset
+        : DEFAULT_OPTIONS.style.highlightPreset,
+      highlightCustomColor: typeof options.style?.highlightCustomColor === 'string'
+        ? options.style.highlightCustomColor
+        : DEFAULT_OPTIONS.style.highlightCustomColor,
     },
     format: {
       addNumbers: typeof options.format?.addNumbers === 'boolean'
@@ -118,7 +130,11 @@ function isValidTheme(value: unknown): value is ThemeName {
 }
 
 function isValidDensity(value: unknown): value is Density {
-  return ['comfortable', 'standard', 'compact'].includes(value as string);
+  return ['comfortable', 'standard', 'compact', 'extra-comfortable', 'extra-compact'].includes(value as string);
+}
+
+function isValidHighlightPreset(value: unknown): value is HighlightPreset {
+  return ['yellow', 'green', 'pink', 'blue', 'orange', 'custom'].includes(value as string);
 }
 
 /**

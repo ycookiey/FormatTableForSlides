@@ -3,7 +3,7 @@
  */
 
 import './style.css';
-import type { AllOptions, TableData, ThemeName, Density, SeparatorType } from './types';
+import type { AllOptions, TableData, ThemeName, Density, SeparatorType, HighlightPreset } from './types';
 import { parseInput, normalizeColumns } from './parser';
 import { transformLayout } from './transformer';
 import { addRowNumbers, formatNumbers } from './formatter';
@@ -22,6 +22,9 @@ const elements = {
   theme: document.getElementById('theme') as HTMLDivElement,
   zebra: document.getElementById('zebra') as HTMLInputElement,
   density: document.getElementById('density') as HTMLInputElement,
+  highlightWords: document.getElementById('highlight-words') as HTMLTextAreaElement,
+  highlightPresets: document.getElementById('highlight-presets') as HTMLDivElement,
+  highlightCustomColor: document.getElementById('highlight-custom-color') as HTMLInputElement,
   preview: document.getElementById('preview') as HTMLDivElement,
   copyButton: document.getElementById('copy-button') as HTMLButtonElement,
   sampleButton: document.getElementById('sample-button') as HTMLButtonElement,
@@ -37,6 +40,19 @@ function getSegmentValue(container: HTMLElement): string {
 function setSegmentValue(container: HTMLElement, value: string): void {
   container.querySelectorAll('button').forEach(btn => {
     btn.classList.toggle('active', btn.getAttribute('data-value') === value);
+  });
+}
+
+/** 色ボタンのセグメント値を取得（data-color属性用） */
+function getColorSegmentValue(container: HTMLElement): string {
+  const active = container.querySelector('button.active');
+  return active?.getAttribute('data-color') || '';
+}
+
+/** 色ボタンのセグメント値を設定（data-color属性用） */
+function setColorSegmentValue(container: HTMLElement, value: string): void {
+  container.querySelectorAll('button').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-color') === value);
   });
 }
 
@@ -87,6 +103,9 @@ function getOptions(): AllOptions {
       theme: getSegmentValue(elements.theme) as ThemeName,
       zebra: elements.zebra.checked,
       density: DENSITY_MAP[densityValue] || 'standard',
+      highlightWords: parseHighlightWords(elements.highlightWords.value),
+      highlightPreset: (getColorSegmentValue(elements.highlightPresets) as HighlightPreset) || 'yellow',
+      highlightCustomColor: elements.highlightCustomColor.value,
     },
     format: {
       addNumbers: elements.addNumbers.checked,
@@ -155,6 +174,14 @@ function debounce<T extends (...args: unknown[]) => void>(
 // デバウンス付きの更新関数
 const debouncedUpdate = debounce(updatePreview, 100);
 
+/** ハイライト単語をパース（カンマ、セミコロン、改行、和文句読点に対応） */
+function parseHighlightWords(input: string): string[] {
+  return input
+    .split(/[,、，;;\n\r]+/)
+    .map(w => w.trim())
+    .filter(w => w.length > 0);
+}
+
 /**
  * イベントリスナーを設定
  */
@@ -191,6 +218,29 @@ function setupEventListeners(): void {
       updatePreview();
     }
   });
+
+  // ハイライト単語入力（デバウンス付き）
+  elements.highlightWords.addEventListener('input', debouncedUpdate);
+
+  // ハイライト色プリセット
+  elements.highlightPresets.addEventListener('click', (e) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === 'BUTTON') {
+      const color = target.getAttribute('data-color') || 'yellow';
+      setColorSegmentValue(elements.highlightPresets, color);
+      
+      // customの場合はカラーピッカーを表示
+      if (color === 'custom') {
+        elements.highlightCustomColor.classList.remove('hidden');
+      } else {
+        elements.highlightCustomColor.classList.add('hidden');
+      }
+      updatePreview();
+    }
+  });
+
+  // カスタムカラーピッカー
+  elements.highlightCustomColor.addEventListener('input', updatePreview);
 
   // サンプル入力ボタン
   elements.sampleButton.addEventListener('click', () => {
@@ -234,6 +284,14 @@ function loadStoredData(): void {
   setSegmentValue(elements.theme, stored.options.style.theme);
   elements.zebra.checked = stored.options.style.zebra;
   elements.density.value = String(DENSITY_REVERSE[stored.options.style.density] || 3);
+
+  // ハイライト設定を復元
+  elements.highlightWords.value = stored.options.style.highlightWords.join(', ');
+  setColorSegmentValue(elements.highlightPresets, stored.options.style.highlightPreset);
+  elements.highlightCustomColor.value = stored.options.style.highlightCustomColor;
+  if (stored.options.style.highlightPreset === 'custom') {
+    elements.highlightCustomColor.classList.remove('hidden');
+  }
 }
 
 // 初期化

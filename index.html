@@ -121,6 +121,27 @@
                   </datalist>
                 </div>
               </div>
+
+              <div class="option-row highlight-row">
+                <label for="highlight-words">ハイライト単語</label>
+                <textarea id="highlight-words" class="highlight-input" rows="2"
+                  placeholder="カンマまたは改行区切りで入力..."></textarea>
+              </div>
+
+              <div class="option-row">
+                <label>ハイライト色</label>
+                <div class="highlight-color-options">
+                  <div class="color-presets" id="highlight-presets">
+                    <button type="button" data-color="yellow" class="color-btn active" style="background:#FFFF99" title="黄"></button>
+                    <button type="button" data-color="green" class="color-btn" style="background:#90EE90" title="緑"></button>
+                    <button type="button" data-color="pink" class="color-btn" style="background:#FFB6C1" title="ピンク"></button>
+                    <button type="button" data-color="blue" class="color-btn" style="background:#87CEEB" title="青"></button>
+                    <button type="button" data-color="orange" class="color-btn" style="background:#FFD700" title="オレンジ"></button>
+                    <button type="button" data-color="custom" class="color-btn custom-btn" title="カスタム">⋯</button>
+                  </div>
+                  <input type="color" id="highlight-custom-color" class="color-picker hidden" value="#FFFF99" />
+                </div>
+              </div>
             </div>
           </div>
         </section>

@@ -21,6 +21,9 @@ export interface LayoutOptions {
   separatorType: SeparatorType;
 }
 
+/** ハイライト色のプリセット名 */
+export type HighlightPreset = 'yellow' | 'green' | 'pink' | 'blue' | 'orange' | 'custom';
+
 /** デザイン設定 */
 export interface StyleOptions {
   /** テーマ名 */
@@ -29,6 +32,12 @@ export interface StyleOptions {
   zebra: boolean;
   /** 密度 */
   density: Density;
+  /** ハイライト単語リスト */
+  highlightWords: string[];
+  /** ハイライト色プリセット */
+  highlightPreset: HighlightPreset;
+  /** カスタムハイライト色（16進数） */
+  highlightCustomColor: string;
 }
 
 /** データ加工設定 */

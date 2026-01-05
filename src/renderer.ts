@@ -2,7 +2,7 @@
  * HTMLテーブル生成・スタイリング
  */
 
-import type { TableData, StyleOptions, ThemeColors, ThemeName, Density, Alignment } from './types';
+import type { TableData, StyleOptions, ThemeColors, ThemeName, Density, Alignment, HighlightPreset } from './types';
 import { detectAlignment } from './formatter';
 
 /** テーマカラー定義 */
@@ -41,6 +41,30 @@ const DENSITY_PADDING: Record<Density, string> = {
   compact: '4px 8px',
   'extra-compact': '2px 4px',
 };
+
+/** ハイライトプリセット色 */
+const HIGHLIGHT_COLORS: Record<Exclude<HighlightPreset, 'custom'>, string> = {
+  yellow: '#FFFF99',
+  green: '#90EE90',
+  pink: '#FFB6C1',
+  blue: '#87CEEB',
+  orange: '#FFD700',
+};
+
+/** ハイライト色を取得 */
+function getHighlightColor(style: StyleOptions): string {
+  if (style.highlightPreset === 'custom') {
+    return style.highlightCustomColor;
+  }
+  return HIGHLIGHT_COLORS[style.highlightPreset] || HIGHLIGHT_COLORS.yellow;
+}
+
+/** セルがハイライト対象か判定（完全一致） */
+function shouldHighlight(cellValue: string, highlightWords: string[]): boolean {
+  if (highlightWords.length === 0) return false;
+  const lowerCell = cellValue.toLowerCase().trim();
+  return highlightWords.some(word => lowerCell === word.toLowerCase().trim());
+}
 
 /**
  * 文字列の推定幅を計算（全角=2, 半角=1として概算）
@@ -102,6 +126,8 @@ export function renderTable(data: TableData, style: StyleOptions): string {
   const alignments = detectAlignment(data);
   const separatorSet = new Set(data.separatorColumns || []);
   const borderBoundarySet = new Set(data.borderBoundaries || []);
+  const highlightColor = getHighlightColor(style);
+  const highlightWords = style.highlightWords || [];
   
   // 列幅を計算（ヘッダーを含む）
   const columnWidths = calculateColumnWidths(data, separatorSet);
@@ -164,8 +190,12 @@ export function renderTable(data: TableData, style: StyleOptions): string {
         const separatorStyle = buildSeparatorStyle();
         html += `<td style="${separatorStyle}"></td>`;
       } else {
+        // ハイライト判定
+        const isHighlighted = shouldHighlight(cell, highlightWords);
+        const cellBg = isHighlighted ? highlightColor : rowBg;
+        
         const cellStyle = buildCellStyle({
-          backgroundColor: rowBg,
+          backgroundColor: cellBg,
           padding,
           textAlign: alignments[colIndex] || 'left',
           minWidth: columnPxWidths[colIndex],
