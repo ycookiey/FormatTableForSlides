@@ -28,6 +28,10 @@ const elements = {
   preview: document.getElementById('preview') as HTMLDivElement,
   copyButton: document.getElementById('copy-button') as HTMLButtonElement,
   sampleButton: document.getElementById('sample-button') as HTMLButtonElement,
+  // 分割情報表示
+  inputItemCount: document.getElementById('input-item-count') as HTMLSpanElement,
+  splitInfo: document.getElementById('split-info') as HTMLDivElement,
+  toggleSplitInfo: document.getElementById('toggle-split-info') as HTMLButtonElement,
 };
 
 /** セグメントコントロールから値を取得 */
@@ -142,6 +146,9 @@ function updatePreview(): void {
     data = formatNumbers(data);
   }
 
+  // 分割前の行数を保存
+  const originalRowCount = data.rows.length;
+
   // 3. レイアウト変換
   data = transformLayout(data, options.layout);
 
@@ -155,6 +162,9 @@ function updatePreview(): void {
 
   // 設定を自動保存
   saveData(inputText, options);
+
+  // 件数・分割情報を更新（元の行数を使用）
+  updateStatsDisplay(originalRowCount, options.layout.splitColumns);
 }
 
 /**
@@ -173,6 +183,68 @@ function debounce<T extends (...args: unknown[]) => void>(
 
 // デバウンス付きの更新関数
 const debouncedUpdate = debounce(updatePreview, 100);
+
+/**
+ * 分割情報を表示
+ */
+function updateStatsDisplay(itemCount: number, currentSplit: number): void {
+  // データ入力セクションの件数表示
+  if (itemCount === 0) {
+    elements.inputItemCount.classList.add('hidden');
+    return;
+  }
+
+  elements.inputItemCount.classList.remove('hidden');
+  elements.inputItemCount.textContent = `${itemCount} 件`;
+
+  // 分割オプションを生成（1〜10分割）
+  const maxSplit = 10;
+  let html = '';
+
+  for (let split = 1; split <= maxSplit; split++) {
+    const rows = Math.ceil(itemCount / split);
+    const cols = split;
+    const isActive = split === currentSplit;
+    const activeClass = isActive ? 'active' : '';
+
+    // アスペクト比を表す長方形を生成（最大幅36px, 高さ36pxでスケール）
+    const maxSize = 36;
+    const ratio = cols / rows;
+    let rectWidth: number, rectHeight: number;
+    if (ratio >= 1) {
+      rectWidth = maxSize;
+      rectHeight = Math.max(10, maxSize / ratio);
+    } else {
+      rectHeight = maxSize;
+      rectWidth = Math.max(10, maxSize * ratio);
+    }
+
+    html += `
+      <div class="split-option ${activeClass}" data-split="${split}" title="${split}分割">
+        <div class="split-grid">
+          <span class="grid-spacer"></span>
+          <span class="dim-label dim-width">${cols}</span>
+          <span class="dim-label dim-height">${rows}</span>
+          <div class="split-visual-rect" style="width: ${rectWidth}px; height: ${rectHeight}px;"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  elements.splitInfo.innerHTML = html;
+
+  // 分割オプションのクリックイベント
+  elements.splitInfo.querySelectorAll('.split-option').forEach(option => {
+    option.addEventListener('click', (e) => {
+      const target = e.currentTarget as HTMLElement;
+      const splitValue = target.getAttribute('data-split');
+      if (splitValue) {
+        elements.splitColumns.value = splitValue;
+        updatePreview();
+      }
+    });
+  });
+}
 
 /** ハイライト単語をパース（カンマ、セミコロン、改行、和文句読点に対応） */
 function parseHighlightWords(input: string): string[] {
@@ -241,6 +313,12 @@ function setupEventListeners(): void {
 
   // カスタムカラーピッカー
   elements.highlightCustomColor.addEventListener('input', updatePreview);
+
+  // 分割情報トグル
+  elements.toggleSplitInfo.addEventListener('click', () => {
+    elements.splitInfo.classList.toggle('collapsed');
+    elements.toggleSplitInfo.classList.toggle('expanded');
+  });
 
   // サンプル入力ボタン
   elements.sampleButton.addEventListener('click', () => {

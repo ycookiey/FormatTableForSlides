@@ -20,6 +20,7 @@
           <div class="input-section">
             <div class="input-header">
               <label for="data-input" class="section-label">データ入力</label>
+              <span id="input-item-count" class="input-item-count hidden">0 件</span>
               <button id="sample-button" class="sample-button">サンプルを入力</button>
             </div>
             <textarea 
@@ -34,7 +35,7 @@
             <div class="option-group">
               <label class="section-label">レイアウト設定</label>
               
-              <div class="option-row">
+              <div class="option-row split-row-header">
                 <label for="split-columns">分割数</label>
                 <div class="slider-with-ticks">
                   <input type="range" id="split-columns" min="1" max="10" value="1" list="split-ticks" />
@@ -51,6 +52,15 @@
                     <option value="10" label="10"></option>
                   </datalist>
                 </div>
+                <button type="button" id="toggle-split-info" class="toggle-split-btn" title="分割オプションを表示">
+                  <span class="toggle-text">詳細</span>
+                  <span class="toggle-icon">▶</span>
+                </button>
+              </div>
+
+              <!-- 分割情報グリッド -->
+              <div id="split-info" class="split-info-grid collapsed">
+                <!-- JavaScriptで動的に生成 -->
               </div>
 
               <div class="option-row">
