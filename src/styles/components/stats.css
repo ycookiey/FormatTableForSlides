@@ -1,0 +1,155 @@
+/* ========================================
+   Data Stats Display
+   ======================================== */
+
+.data-stats {
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: linear-gradient(135deg, #f8f9ff 0%, #f0f4ff 100%);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(68, 114, 196, 0.2);
+}
+
+.data-stats.hidden {
+  display: none;
+}
+
+.stats-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.stats-icon {
+  font-size: 1.2rem;
+}
+
+.item-count {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--color-primary);
+}
+
+.split-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: var(--spacing-xs);
+}
+
+.split-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--spacing-sm);
+  background: white;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.split-option:hover {
+  border-color: var(--color-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(68, 114, 196, 0.15);
+}
+
+.split-option.active {
+  border-color: var(--color-primary);
+  background: linear-gradient(135deg, #e8f0ff 0%, #dbe8ff 100%);
+}
+
+.split-label {
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.split-size {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 2px 0;
+}
+
+.split-option.active .split-size {
+  color: var(--color-primary);
+}
+
+.split-visual {
+  display: grid;
+  gap: 1px;
+  margin-top: 4px;
+}
+
+.split-visual-cell {
+  width: 6px;
+  height: 6px;
+  background: var(--color-primary);
+  border-radius: 1px;
+  opacity: 0.4;
+}
+
+.split-option.active .split-visual-cell {
+  opacity: 0.8;
+}
+
+/* ========================================
+   Toggle Split Info Button
+   ======================================== */
+
+.toggle-split-btn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.toggle-split-btn:hover {
+  background: rgba(68, 114, 196, 0.1);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.toggle-icon {
+  font-size: 0.6rem;
+  transition: transform 0.2s ease;
+}
+
+.toggle-split-btn.expanded .toggle-icon {
+  transform: rotate(90deg);
+}
+
+.split-info-grid.collapsed {
+  display: none;
+}
+
+/* ========================================
+   Input Item Count Badge
+   ======================================== */
+
+.input-item-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  background: rgba(68, 114, 196, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  margin-left: auto;
+  margin-right: var(--spacing-sm);
+}
+
+.input-item-count.hidden {
+  display: none;
+}
+

@@ -1,0 +1,32 @@
+/* ========================================
+   Preview
+   ======================================== */
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-md);
+}
+
+.preview-area {
+  flex: 1;
+  min-height: 300px;
+  padding: var(--spacing-lg);
+  background: #fafafa;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: auto;
+}
+
+.placeholder-text {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--spacing-xl);
+}
+
+/* ========================================
+   Generated Table Styles (Preview)
+   �C�����C���X�^�C���݂̂Ő��䂷�邽�߁A
+   �v���r���[�p�̏㏑���X�^�C���͐ݒ肵�Ȃ�
+   ======================================== */
