@@ -15,7 +15,7 @@ export interface TableData {
 
 /** レイアウト設定 */
 export interface LayoutOptions {
-  /** 分割数（1-5） */
+  /** 分割数（1-10） */
   splitColumns: number;
   /** ブロック区切りタイプ */
   separatorType: SeparatorType;
